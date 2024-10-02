@@ -21,7 +21,18 @@ class StandController extends BaseController
 
     public function getEligibleStands(string $catastralNbr) {
         $stands = $this->getStands($catastralNbr);
-        return $stands;
+        $total = $stands->count();
+        $eligibleNow = $stands->where("yearsToLogging", "<=", 0)->count();
+        $result = [
+            "totalCount" => $total,
+            "eligibleNow" => $eligibleNow,
+            "eligibleInFuture" => $total - $eligibleNow,
+            "stands" => $stands->sortBy([
+                ["yearsToLogging", "asc"],
+                ["area", "desc"]
+            ])->values()->all(),
+        ];
+        return $result;
     }
 
     private function getStands(string $catastralNbr) {
@@ -43,7 +54,9 @@ class StandController extends BaseController
                 $stand->bonityCode = $standDetails->boniteediKood;
                 $stand->age = $standDetails->keskmVanus ?? null;
                 $stand->loggingAge = $standDetails->keskmRaievanus ?? null;
-                //$stand->elements = $standDetails->elemendid;
+                $stand->diameter = $standDetails->keskmDiameeter ?? null;
+                $stand->height = $standDetails->korgus ?? null;
+                $stand->elements = $standDetails->elemendid;
 
                 $this->calculateEligibility($stand);
     
@@ -51,7 +64,7 @@ class StandController extends BaseController
             }
         }
 
-        return $stands->sortBy("yearsToLogging")->values()->all();
+        return $stands;
     }
 
     private function calculateEligibility(Stand &$stand) {
