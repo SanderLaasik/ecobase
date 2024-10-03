@@ -49,6 +49,7 @@ class StandController extends BaseController
                 $stand = new Stand();
                 $stand->id = $standDetails->id;
                 $stand->catastralNbr = $standDetails->katastriNr;
+                $stand->quarterNbr = $standDetails->kvartaliNr ?? null;
                 $stand->standNbr = $standDetails->eraldiseNr;
                 $stand->area = $standDetails->pindala;
                 $stand->bonityCode = $standDetails->boniteediKood;
@@ -57,10 +58,14 @@ class StandController extends BaseController
                 $stand->diameter = $standDetails->keskmDiameeter ?? null;
                 $stand->height = $standDetails->korgus ?? null;
                 $stand->elements = $standDetails->elemendid;
+                $stand->geoJson = json_decode($standDetails->alaGeoJson, true);
 
                 $this->calculateEligibility($stand);
     
-                if($stand->eligibility) $stands->push($stand);
+                if($stand->eligibility) {
+                    $stands->push($stand);
+                    return $stands;
+                }
             }
         }
 
