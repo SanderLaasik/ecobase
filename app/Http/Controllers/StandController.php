@@ -62,10 +62,7 @@ class StandController extends BaseController
 
                 $this->calculateEligibility($stand);
     
-                if($stand->eligibility) {
-                    $stands->push($stand);
-                    return $stands;
-                }
+                if($stand->eligibility) $stands->push($stand);
             }
         }
 
